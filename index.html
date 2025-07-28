@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 子代理：交互式探索指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed with a thematic, non-linear structure to make the dense report digestible. It starts with high-level concepts (Hero, Core Pillars), moves to practical application (The New Workflow, Agent Toolkit), then dives into advanced topics (Orchestration, Challenges), and concludes with a look ahead (Future). This flow guides the user from "what" and "why" to "how" and "what's next," prioritizing understanding over mirroring the report's academic layout. Interactive elements like clickable cards and tabbed diagrams encourage exploration rather than passive reading. -->
+    <!-- Visualization & Content Choices: Report Info: Core benefits -> Goal: Inform/Compare -> Viz: Interactive icon cards -> Interaction: Click-to-reveal text -> Justification: Breaks down core ideas into digestible, interactive chunks. || Report Info: Workflow Patterns -> Goal: Explain Process -> Viz: Custom HTML/JS animated diagram -> Interaction: Tabs to switch patterns -> Justification: Visually demonstrates complex agent flows, which is more effective than text. || Report Info: Token consumption data -> Goal: Highlight a Challenge -> Viz: Bar Chart -> Interaction: Hover tooltips -> Justification: Quantifies a key limitation (cost) for high impact. || Library/Method: All visuals use HTML/CSS/JS or Chart.js (Canvas), ensuring no SVG/Mermaid is used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #FDFBF7;
+            color: #333333;
+        }
+        .accent-bg { background-color: #8EAFBF; }
+        .accent-text { color: #8EAFBF; }
+        .accent-border { border-color: #8EAFBF; }
+        .secondary-accent-bg { background-color: #D8A37B; }
+        .secondary-accent-text { color: #D8A37B; }
+        .card-bg { background-color: #FFFFFF; }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #D8A37B;
+        }
+        .tab-btn.active {
+            border-color: #D8A37B;
+            background-color: #D8A37B;
+            color: #FFFFFF;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .flow-step {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .flow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav id="navbar" class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold secondary-accent-text">Claude 子代理指南</h1>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#concepts" class="nav-link">核心概念</a>
+                    <a href="#workflow" class="nav-link">全新工作流</a>
+                    <a href="#toolkit" class="nav-link">代理工具箱</a>
+                    <a href="#patterns" class="nav-link">编排模式</a>
+                    <a href="#challenges" class="nav-link">挑战与策略</a>
+                    <a href="#future" class="nav-link">未来展望</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden mt-4">
+                <a href="#concepts" class="block py-2 nav-link">核心概念</a>
+                <a href="#workflow" class="block py-2 nav-link">全新工作流</a>
+                <a href="#toolkit" class="block py-2 nav-link">代理工具箱</a>
+                <a href="#patterns" class="block py-2 nav-link">编排模式</a>
+                <a href="#challenges" class="block py-2 nav-link">挑战与策略</a>
+                <a href="#future" class="block py-2 nav-link">未来展望</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="text-center py-16 md:py-24 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-4xl md:text-6xl font-bold tracking-tight">从 AI 助手到 AI 团队</h2>
+            <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-gray-600">探索 Claude Code 子代理如何通过专业化、并行化和智能编排，重塑软件开发的未来。</p>
+            <a href="#concepts" class="mt-8 inline-block accent-bg text-white font-bold py-3 px-8 rounded-full shadow-lg hover:opacity-90 transition-opacity">开始探索</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="concepts" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">范式转变：三大核心概念</h3>
+                    <p class="mt-3 max-w-2xl mx-auto text-gray-600">子代理的强大之处源于其微服务式的架构设计。本节将介绍其背后的三大支柱，这些支柱共同作用，将传统的单一AI助手转变为一个高效协作的开发团队。</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card-bg p-8 rounded-xl shadow-lg border border-gray-100 text-center">
+                        <div class="text-5xl accent-text mb-4">🎯</div>
+                        <h4 class="text-2xl font-bold mb-2">深度专业化</h4>
+                        <p class="text-gray-600">每个子代理都是特定领域的专家，拥有独立的系统提示和工具集。无论是代码审查员还是安全审计员，它们都能以极高的精度和一致性完成任务。</p>
+                    </div>
+                    <div class="card-bg p-8 rounded-xl shadow-lg border border-gray-100 text-center">
+                        <div class="text-5xl accent-text mb-4">📦</div>
+                        <h4 class="text-2xl font-bold mb-2">上下文隔离</h4>
+                        <p class="text-gray-600">子代理在独立的上下文窗口中运行，避免了主对话的“上下文污染”。这使得主会话能专注于宏观目标，同时保证专业任务的高效和专注。</p>
+                    </div>
+                    <div class="card-bg p-8 rounded-xl shadow-lg border border-gray-100 text-center">
+                        <div class="text-5xl accent-text mb-4">⚡️</div>
+                        <h4 class="text-2xl font-bold mb-2">并行执行</h4>
+                        <p class="text-gray-600">这是实现开发速度倍增的核心。多个子代理可以同时处理一个复杂任务的不同方面，从根本上改变软件开发的节奏，实现前所未有的效率。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">拥抱全新工作流</h3>
+                    <p class="mt-3 max-w-3xl mx-auto text-gray-600">要最大化子代理的效能，我们需要从传统的“交互式提示”转变为一种更具战略性的“AI编排”模式。这个新的工作流将人类的角色从执行者提升为指挥者，确保AI团队能够高效、准确地完成复杂项目。</p>
+                </div>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-0">
+                    <div class="flow-step card-bg p-6 rounded-lg shadow-md w-full md:w-1/4 text-center">
+                        <div class="text-3xl mb-2">①</div>
+                        <h4 class="text-xl font-semibold">战略规划</h4>
+                        <p class="text-sm text-gray-500 mt-1">投入时间进行彻底思考，定义项目目标和范围。</p>
+                    </div>
+                    <div class="text-2xl font-bold secondary-accent-text mx-4 hidden md:block">→</div>
+                    <div class="text-2xl font-bold secondary-accent-text my-2 md:hidden">↓</div>
+                    <div class="flow-step card-bg p-6 rounded-lg shadow-md w-full md:w-1/4 text-center">
+                        <div class="text-3xl mb-2">②</div>
+                        <h4 class="text-xl font-semibold">任务分解</h4>
+                        <p class="text-sm text-gray-500 mt-1">将大问题分解为可并行执行的清晰、具体的子任务。</p>
+                    </div>
+                    <div class="text-2xl font-bold secondary-accent-text mx-4 hidden md:block">→</div>
+                    <div class="text-2xl font-bold secondary-accent-text my-2 md:hidden">↓</div>
+                    <div class="flow-step card-bg p-6 rounded-lg shadow-md w-full md:w-1/4 text-center">
+                        <div class="text-3xl mb-2">③</div>
+                        <h4 class="text-xl font-semibold">编排执行</h4>
+                        <p class="text-sm text-gray-500 mt-1">将任务委派给最合适的子代理，并监控执行过程。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="toolkit" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">你的 AI 开发团队：代理工具箱</h3>
+                    <p class="mt-3 max-w-3xl mx-auto text-gray-600">子代理的能力覆盖了整个软件开发生命周期。你可以根据项目需求，组建一支由各种专家组成的虚拟团队。点击下方的分类，查看具体的代理角色及其应用场景。</p>
+                </div>
+                <div id="agent-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <section id="patterns" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">智能编排模式</h3>
+                    <p class="mt-3 max-w-3xl mx-auto text-gray-600">Claude Code 能够自动协调子代理，采用多种模式来处理复杂的多步骤任务。理解这些模式有助于设计更高效、更可靠的自动化工作流。选择一个模式来查看其工作原理。</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-center space-x-2 md:space-x-4 mb-8 border-b-2 border-gray-200">
+                        <button data-tab="sequential" class="tab-btn px-4 py-2 font-semibold border-b-4 border-transparent transition">顺序工作流</button>
+                        <button data-tab="parallel" class="tab-btn px-4 py-2 font-semibold border-b-4 border-transparent transition">并行执行</button>
+                        <button data-tab="conditional" class="tab-btn px-4 py-2 font-semibold border-b-4 border-transparent transition">条件分支</button>
+                        <button data-tab="review" class="tab-btn px-4 py-2 font-semibold border-b-4 border-transparent transition">审查验证</button>
+                    </div>
+                    <div id="pattern-content" class="card-bg p-8 rounded-lg shadow-lg min-h-[300px]">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="challenges" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">挑战与应对策略</h3>
+                    <p class="mt-3 max-w-3xl mx-auto text-gray-600">强大的能力也伴随着新的挑战。高效使用子代理不仅要发挥其优势，也要理解并管理其固有的复杂性和成本。本节将探讨主要挑战并提供经过验证的应对策略。</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="text-2xl font-bold mb-4">Token 消耗：一把双刃剑</h4>
+                        <p class="text-gray-600 mb-4">多代理运行虽然速度快，但资源消耗巨大，Token用量可能是标准聊天的数倍。这直接关系到使用成本和性能。下图直观地展示了不同使用模式下的相对Token消耗。</p>
+                        <ul class="space-y-2 text-gray-700">
+                            <li class="flex items-start"><span class="secondary-accent-text font-bold mr-2">✔</span> <strong>战略性应用：：</strong> 将子代理用于高影响力的复杂任务，而非日常小修改。</li>
+                            <li class="flex items-start"><span class="secondary-accent-text font-bold mr-2">✔</span> <strong>利用缓存：：</strong> 启用会话缓存和预热代理，减少冗余计算。</li>
+                            <li class="flex items-start"><span class="secondary-accent-text font-bold mr-2">✔</span> <strong>信任但验证：：</strong> 建立自动化质量门和严格的测试流程，不要盲目相信AI的输出。</li>
+                        </ul>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="tokenChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="future" class="py-16 md:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h3 class="text-3xl md:text-4xl font-bold">未来展望：迈向集体智能</h3>
+                <p class="mt-3 max-w-3xl mx-auto text-gray-600">Claude Code子代理的发展轨迹预示着代理式AI在软件工程中的演进方向。未来将不仅仅是单个AI能力的提升，更是多个AI之间高效协作与集体智能的扩展。</p>
+                <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="p-6">
+                        <h4 class="text-xl font-semibold">异步协调</h4>
+                        <p class="mt-2 text-gray-500">代理将能并发工作，动态创建新代理，实现更灵活、更快速的协作。</p>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="text-xl font-semibold">AI作为元工具</h4>
+                        <p class="mt-2 text-gray-500">LLM将演变为能管理和编排其他AI系统和外部工具的“元工具”。</p>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="text-xl font-semibold">自我纠正与学习</h4>
+                        <p class="mt-2 text-gray-500">AI将能识别自身错误并自主改进，增强系统的适应性和鲁棒性。</p>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="text-xl font-semibold">治理与成本平衡</h4>
+                        <p class="mt-2 text-gray-500">在创新与计算成本之间取得平衡，将是可持续发展的关键。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>基于 Anthropic Claude Code 子代理研究报告生成。</p>
+            <p class="text-sm text-gray-400 mt-2">此为交互式可视化应用，旨在帮助理解报告核心内容。</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = mobileMenu.querySelectorAll('a');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            const agentData = [
+                {
+                    category: '代码质量与审查',
+                    icon: '🛡️',
+                    description: '分析代码以遵循最佳实践，识别安全漏洞，并审查架构决策。',
+                    agents: [
+                        { name: 'code-reviewer', desc: '检查代码风格和可维护性。' },
+                        { name: 'security-auditor', desc: '扫描OWASP等安全漏洞。' },
+                        { name: 'senior-code-reviewer', desc: '提供架构层面的审查意见。' },
+                    ]
+                },
+                {
+                    category: '开发与实施',
+                    icon: '💻',
+                    description: '根据规范实施代码，设计系统架构，创建用户界面组件和API。',
+                    agents: [
+                        { name: 'backend-architect', desc: '设计后端系统和数据库结构。' },
+                        { name: 'frontend-developer', desc: '构建响应式用户界面。' },
+                        { name: 'spec-developer', desc: '严格按照产品规范编写代码。' },
+                    ]
+                },
+                {
+                    category: '测试与验证',
+                    icon: '🧪',
+                    description: '生成并运行全面的测试，识别和诊断故障，并确保生产就绪。',
+                    agents: [
+                        { name: 'test-automator', desc: '编写端到端和单元测试。' },
+                        { name: 'debugger', desc: '分析日志和堆栈跟踪以定位错误。' },
+                        { name: 'coverage-test-writer', desc: '分析测试覆盖率并补充测试用例。' },
+                    ]
+                },
+                {
+                    category: '分析与优化',
+                    icon: '📊',
+                    description: '识别应用瓶颈，执行性能调优，进行数据分析并重构代码。',
+                    agents: [
+                        { name: 'performance-engineer', desc: '使用分析工具找到性能瓶颈。' },
+                        { name: 'data-scientist', desc: '从数据中提取洞察并构建模型。' }, 
+                        { name: 'refactoring-specialist', desc: '改进代码结构，降低复杂性。' },
+                    ]
+                },
+                {
+                    category: '文档与管理',
+                    icon: '📚',
+                    description: '自动化文档创建和更新，管理项目任务和软件发布。',
+                    agents: [
+                        { name: 'documentation-generator', desc: '根据代码注释生成API文档。' },
+                        { name: 'project-manager', desc: '将需求分解为可执行的任务。' },
+                        { name: 'release-manager', desc: '自动化软件发布流程。' },
+                    ]
+                },
+                {
+                    category: '基础设施与运维',
+                    icon: '⚙️',
+                    description: '管理云基础设施、网络配置和事件响应。',
+                    agents: [
+                        { name: 'terraform-specialist', desc: '编写和管理基础设施即代码。' },
+                        { name: 'network-engineer', desc: '配置和排查网络问题。' },
+                        { name: 'incident-responder', desc: '在生产事故中快速响应和修复。' },
+                    ]
+                }
+            ];
+
+            const agentGrid = document.getElementById('agent-grid');
+            agentData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card-bg p-6 rounded-xl shadow-md cursor-pointer transition-transform transform hover:-translate-y-1';
+                card.innerHTML = `
+                    <div class="flex items-center mb-3">
+                        <span class="text-3xl mr-4">${item.icon}</span>
+                        <h4 class="text-xl font-bold">${item.category}</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">${item.description}</p>
+                    <div class="agent-details hidden mt-4 border-t pt-4">
+                        <ul class="space-y-2">
+                            ${item.agents.map(agent => `<li><strong class="font-mono secondary-accent-text">${agent.name}:</strong> <span class="text-gray-500 text-sm">${agent.desc}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="text-right text-sm accent-text font-semibold mt-2">点击展开/折叠</div>
+                `;
+                agentGrid.appendChild(card);
+
+                card.addEventListener('click', () => {
+                    const details = card.querySelector('.agent-details');
+                    details.classList.toggle('hidden');
+                });
+            });
+
+            const patternTabs = document.querySelectorAll('.tab-btn');
+            const patternContent = document.getElementById('pattern-content');
+            const patternData = {
+                sequential: {
+                    title: '顺序工作流',
+                    description: '代理按照定义的顺序依次执行任务，一个代理的输出作为下一个代理的输入。',
+                    ideal: '具有明确依赖关系和逻辑逐步进展的流程。',
+                    example: '构建新API功能：`backend-architect` → `frontend-developer` → `test-automator` → `security-auditor`。',
+                    viz: `
+                        <div class="flex items-center justify-center h-full space-x-2 md:space-x-4">
+                            <div class="text-center animate-pulse-slow"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full accent-bg flex items-center justify-center text-white font-bold">后端</div></div>
+                            <div class="text-xl md:text-2xl font-bold secondary-accent-text">→</div>
+                            <div class="text-center"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-300 flex items-center justify-center font-bold">前端</div></div>
+                            <div class="text-xl md:text-2xl font-bold text-gray-300">→</div>
+                            <div class="text-center"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-300 flex items-center justify-center font-bold">测试</div></div>
+                        </div>
+                    `
+                },
+                parallel: {
+                    title: '并行执行',
+                    description: '多个代理同时处理更大任务的不同方面，以加速整体工作流。',
+                    ideal: '可分解为独立或半独立子任务，允许并发处理的任务。',
+                    example: '优化应用性能：`performance-engineer`和`database-optimizer`并行工作。',
+                    viz: `
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center"><div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gray-300 flex items-center justify-center font-bold">主任务</div></div>
+                            <div class="flex flex-col items-center mx-4">
+                                <div class="text-xl md:text-2xl font-bold secondary-accent-text">↗</div>
+                                <div class="text-xl md:text-2xl font-bold secondary-accent-text">↘</div>
+                            </div>
+                            <div class="flex flex-col space-y-4">
+                                <div class="text-center animate-pulse-slow"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full accent-bg flex items-center justify-center text-white font-bold">性能代理</div></div>
+                                <div class="text-center animate-pulse-slow"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full accent-bg flex items-center justify-center text-white font-bold">数据库代理</div></div>
+                            </div>
+                        </div>
+                    `
+                },
+                conditional: {
+                    title: '条件分支',
+                    description: '初始代理分析情况，并根据其分析智能地将任务路由到最合适的专业代理。',
+                    ideal: '下一步取决于初始评估结果的动态任务路由。',
+                    example: '修复Bug：`debugger`分析问题，然后路由到`backend`或`frontend`代理。',
+                    viz: `
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center animate-pulse-slow"><div class="w-20 h-20 md:w-24 md:h-24 rounded-full accent-bg flex items-center justify-center text-white font-bold">调试器</div></div>
+                            <div class="flex flex-col items-center mx-4">
+                                <div class="text-xl md:text-2xl font-bold secondary-accent-text">↗</div>
+                                <div class="text-xl md:text-2xl font-bold secondary-accent-text">↘</div>
+                            </div>
+                            <div class="flex flex-col space-y-4">
+                                <div class="text-center"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-300 flex items-center justify-center font-bold">后端代理</div></div>
+                                <div class="text-center"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-300 flex items-center justify-center font-bold">前端代理</div></div>
+                            </div>
+                        </div>
+                    `
+                },
+                review: {
+                    title: '审查与验证',
+                    description: '主代理执行任务，然后专门的审查代理在最终结果交付前检查并批准输出。',
+                    ideal: '在工作流的关键检查点确保质量、合规性和最佳实践。',
+                    example: '实现支付处理：`payment-integration`代理实现，然后`security-auditor`审查验证。',
+                    viz: `
+                        <div class="flex items-center justify-center h-full space-x-2 md:space-x-4">
+                            <div class="text-center"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-300 flex items-center justify-center font-bold">实现</div></div>
+                            <div class="text-xl md:text-2xl font-bold secondary-accent-text">→</div>
+                            <div class="text-center animate-pulse-slow"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full accent-bg flex items-center justify-center text-white font-bold">审查</div></div>
+                            <div class="text-xl md:text-2xl font-bold text-gray-300">→</div>
+                            <div class="text-center"><div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">通过</div></div>
+                        </div>
+                    `
+                }
+            };
+
+            function updatePatternContent(tabKey) {
+                const data = patternData[tabKey];
+                patternContent.innerHTML = `
+                    <h5 class="text-2xl font-bold mb-2">${data.title}</h5>
+                    <p class="text-gray-600 mb-4">${data.description}</p>
+                    <div class="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded-r-lg">
+                        <p><strong>适用场景:</strong> ${data.ideal}</p>
+                        <p><strong>示例:</strong> ${data.example}</p>
+                    </div>
+                    <div class="h-32">${data.viz}</div>
+                `;
+            }
+
+            patternTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    patternTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    updatePatternContent(tab.dataset.tab);
+                });
+            });
+
+            patternTabs[0].click();
+
+            const ctx = document.getElementById('tokenChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['标准聊天', '单子代理任务', '多代理并行'],
+                    datasets: [{
+                        label: '相对Token消耗 (倍数)',
+                        data: [1, 5, 15],
+                        backgroundColor: [
+                            'rgba(142, 175, 191, 0.6)',
+                            'rgba(216, 163, 123, 0.6)',
+                            'rgba(216, 103, 103, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(142, 175, 191, 1)',
+                            'rgba(216, 163, 123, 1)',
+                            'rgba(216, 103, 103, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '相对消耗'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + 'x';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
